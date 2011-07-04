@@ -48,7 +48,7 @@ int util_recv_timeout(int socket, void *data, unsigned int length, int timeout)
 	return recv(socket, data, length, 0);
 }
 
-unsigned int util_get_local_ip(int socket)
+unsigned int util_get_local_ip(void)
 {
 	char hostname[200];
 	if (gethostname(hostname, sizeof(hostname)))
@@ -58,5 +58,5 @@ unsigned int util_get_local_ip(int socket)
 	if (host == 0)
 		return 1;
 	
-	return (unsigned int)host->h_addr;
+	return *(unsigned int *)host->h_addr;
 }

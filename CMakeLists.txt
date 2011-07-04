@@ -7,6 +7,7 @@ include_directories("include")
 add_library(steam
 	src/Steam2/serverclient.c
 	src/Steam2/dsclient.c
+	src/Steam2/authclient.c
 	src/Util/socketutil.c
 	src/Util/crypto.c
 )

@@ -124,6 +124,30 @@ steam/fast:
 	$(MAKE) -f CMakeFiles/steam.dir/build.make CMakeFiles/steam.dir/build
 .PHONY : steam/fast
 
+src/Steam2/authclient.o: src/Steam2/authclient.c.o
+.PHONY : src/Steam2/authclient.o
+
+# target to build an object file
+src/Steam2/authclient.c.o:
+	$(MAKE) -f CMakeFiles/steam.dir/build.make CMakeFiles/steam.dir/src/Steam2/authclient.c.o
+.PHONY : src/Steam2/authclient.c.o
+
+src/Steam2/authclient.i: src/Steam2/authclient.c.i
+.PHONY : src/Steam2/authclient.i
+
+# target to preprocess a source file
+src/Steam2/authclient.c.i:
+	$(MAKE) -f CMakeFiles/steam.dir/build.make CMakeFiles/steam.dir/src/Steam2/authclient.c.i
+.PHONY : src/Steam2/authclient.c.i
+
+src/Steam2/authclient.s: src/Steam2/authclient.c.s
+.PHONY : src/Steam2/authclient.s
+
+# target to generate assembly for a file
+src/Steam2/authclient.c.s:
+	$(MAKE) -f CMakeFiles/steam.dir/build.make CMakeFiles/steam.dir/src/Steam2/authclient.c.s
+.PHONY : src/Steam2/authclient.c.s
+
 src/Steam2/dsclient.o: src/Steam2/dsclient.c.o
 .PHONY : src/Steam2/dsclient.o
 
@@ -254,6 +278,9 @@ help:
 	@echo "... libsteam-test"
 	@echo "... rebuild_cache"
 	@echo "... steam"
+	@echo "... src/Steam2/authclient.o"
+	@echo "... src/Steam2/authclient.i"
+	@echo "... src/Steam2/authclient.s"
 	@echo "... src/Steam2/dsclient.o"
 	@echo "... src/Steam2/dsclient.i"
 	@echo "... src/Steam2/dsclient.s"
