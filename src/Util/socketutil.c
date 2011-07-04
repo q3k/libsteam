@@ -51,12 +51,12 @@ int util_recv_timeout(int socket, void *data, unsigned int length, int timeout)
 unsigned int util_get_local_ip(int socket)
 {
 	char hostname[200];
-	if (gethostname(hostname, sizeof(hostname) == SOCKET_ERROR)
+	if (gethostname(hostname, sizeof(hostname)))
 		return 1;
 	
-	struct hostent *host = getbyhostname(hostname);
-	if (phe == 0)
+	struct hostent *host = gethostbyname(hostname);
+	if (host == 0)
 		return 1;
 	
-	return (unsigned int)host->h_addr.S_un.S_un_b;
+	return (unsigned int)host->h_addr;
 }
