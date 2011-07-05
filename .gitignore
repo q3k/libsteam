@@ -4,3 +4,5 @@ cmake_install.cmake
 libsteam-test*
 libsteam.a
 out.bin
+blob_dec.bin
+account_data.bin

@@ -13,6 +13,7 @@ add_library(steam
 	src/Steam2/authclient.c
 	src/Util/socketutil.c
 	src/Util/crypto.c
+	src/Common/blob.c
 )
 
 #libsteam-test

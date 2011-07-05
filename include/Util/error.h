@@ -7,6 +7,6 @@
 #include <stdio.h>
 
 // Error and warning and info logging
-#define ERROR(x) printf("[e] @%s:%i %s\n", __FILE__, __LINE__, x)
+#define ERROR(x) printf("[e] @%s:%i\n[e] %s\n", __FILE__, __LINE__, x)
 
 #endif

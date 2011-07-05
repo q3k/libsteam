@@ -124,6 +124,30 @@ steam/fast:
 	$(MAKE) -f CMakeFiles/steam.dir/build.make CMakeFiles/steam.dir/build
 .PHONY : steam/fast
 
+src/Common/blob.o: src/Common/blob.c.o
+.PHONY : src/Common/blob.o
+
+# target to build an object file
+src/Common/blob.c.o:
+	$(MAKE) -f CMakeFiles/steam.dir/build.make CMakeFiles/steam.dir/src/Common/blob.c.o
+.PHONY : src/Common/blob.c.o
+
+src/Common/blob.i: src/Common/blob.c.i
+.PHONY : src/Common/blob.i
+
+# target to preprocess a source file
+src/Common/blob.c.i:
+	$(MAKE) -f CMakeFiles/steam.dir/build.make CMakeFiles/steam.dir/src/Common/blob.c.i
+.PHONY : src/Common/blob.c.i
+
+src/Common/blob.s: src/Common/blob.c.s
+.PHONY : src/Common/blob.s
+
+# target to generate assembly for a file
+src/Common/blob.c.s:
+	$(MAKE) -f CMakeFiles/steam.dir/build.make CMakeFiles/steam.dir/src/Common/blob.c.s
+.PHONY : src/Common/blob.c.s
+
 src/Steam2/authclient.o: src/Steam2/authclient.c.o
 .PHONY : src/Steam2/authclient.o
 
@@ -278,6 +302,9 @@ help:
 	@echo "... libsteam-test"
 	@echo "... rebuild_cache"
 	@echo "... steam"
+	@echo "... src/Common/blob.o"
+	@echo "... src/Common/blob.i"
+	@echo "... src/Common/blob.s"
 	@echo "... src/Steam2/authclient.o"
 	@echo "... src/Steam2/authclient.i"
 	@echo "... src/Steam2/authclient.s"

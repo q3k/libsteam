@@ -20,24 +20,16 @@ void s2_authclient_init(T_S2_AUTHCLIENT *authclient)
 int s2_authclient_login(T_S2_AUTHCLIENT *authclient, char *username, char *password)
 {
 	if (s2_authclient_request_ip(authclient, username))
-	{
-		ERROR("request ip");
 		return 1;
-	}
 	
 	if (s2_authclient_request_salt(authclient, username))
-	{
-		ERROR("request salt");
 		return 1;
-	}
 	
 	if (s2_authclient_do_login(authclient, password))
-	{
-		ERROR("request salt");
 		return 1;
-	}
 	
-	s2_authclient_get_account_info(authclient);
+	if (s2_authclient_get_account_info(authclient))
+		return 1;
 	
 	return 0;
 }
@@ -164,8 +156,21 @@ unsigned char s2_authclient_get_account_info(T_S2_AUTHCLIENT *authclient)
 	
 	if (result != 0)
 	{
-		printf("%i\n", result);
-		ERROR("result error");
+		switch (result)
+		{
+			case 1:
+				ERROR("No such account!");
+				return 1;
+			case 2:
+				ERROR("Invalid password!");
+				return 1;
+			case 4:
+				ERROR("Account disabled!");
+				return 1;
+			default:
+				ERROR("Unknown error!");
+				return 1;
+		}
 		return 1;
 	}
 	
@@ -183,19 +188,29 @@ unsigned char s2_authclient_get_account_info(T_S2_AUTHCLIENT *authclient)
 		return 1;
 	}
 	
-	void *packet;
+	unsigned char *packet;
 	unsigned int packet_length;
 	
-	if (s2_serverclient_read((T_S2_SERVERCLIENT *)authclient, &packet, &packet_length))
+	if (s2_serverclient_read((T_S2_SERVERCLIENT *)authclient, (void**)&packet, &packet_length))
 	{
 		ERROR("read");
 		return 1;
 	}
-	unsigned short version = ntohs(*(unsigned short *)packet);
-	unsigned char *tgt_iv = ((unsigned char*)packet + 2);
-	unsigned short tgt_plaintext_size =  ntohs(*(((unsigned short *)packet) + 9));
-	unsigned short tgt_ciphertext_size = ntohs(*(((unsigned short *)packet) + 10));
-	unsigned char *tgt_ciphertext = ((unsigned char*)packet + 22);
+	
+	unsigned int offset = 0;
+	unsigned short version = ntohs(*(unsigned short *)packet + offset);
+	offset += 2;
+	printf("Offset: %i\n", offset);
+	unsigned char *tgt_iv = packet + offset;
+	offset += 16;
+	printf("Offset: %i\n", offset);
+	unsigned short tgt_plaintext_size =  ntohs(*(unsigned short *)(packet + offset));
+	offset += 2;
+	printf("Offset: %i\n", offset);
+	unsigned short tgt_ciphertext_size = ntohs(*(unsigned short *)(packet + offset));
+	offset += 2;
+	printf("Offset: %i\n", offset);	
+	unsigned char *tgt_ciphertext = packet + offset;
 	
 	unsigned int tgt_plaintext_size_self;
 	void *tgt_plaintext;
@@ -212,6 +227,28 @@ unsigned char s2_authclient_get_account_info(T_S2_AUTHCLIENT *authclient)
 	}
 	
 	printf("[i] Version %i, tgt size %i/%i.\n", version, tgt_plaintext_size, tgt_ciphertext_size);
+	
+	offset += tgt_ciphertext_size;
+	printf("Offset: %i\n", offset);
+	
+	unsigned short server_tgt_size = ntohs(*(unsigned short *)(packet + offset));
+	offset += 2;
+	printf("Offset: %i\n", offset);
+	offset += server_tgt_size;
+	unsigned int account_record_size = ntohl(*(unsigned int *)(packet + offset));
+	offset += 4;
+	printf("Offset: %i\n", offset);
+	
+	unsigned char *account_data = packet + offset;
+	
+	FILE *f = fopen("account_data.bin", "wb");
+	fwrite(account_data, 1, packet_length - offset, f);
+	fclose(f);
+	printf("[i] Written account data, %u bytes.\n", packet_length - offset);
+	printf("[i] Account record key: ");
+	for (int i = 0; i < 16; i++)
+		printf("%02x", authclient->tgt.account_record_key[i]);
+	printf("\n");
 	
 	free(packet);
 	free(tgt_plaintext);
