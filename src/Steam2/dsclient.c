@@ -27,7 +27,6 @@ int s2_dsclient_get_server_list(T_S2_SERVERCLIENT *serverclient, char server_typ
 int s2_dsclient_get_auth_server(T_S2_SERVERCLIENT *serverclient, char *username, T_S2_AUTH_SERVER *server)
 {
 	unsigned int user_hash = util_jenkins_hash((void *)username, strlen(username)) & 1;
-	printf("userhash: %x\n", util_jenkins_hash((void *)username, strlen(username)));
 	if (s2_dsclient_get_server_list(serverclient, E_S2_SERVER_ProxyASClientAuthentication, (void* )&user_hash, 4))
 	{
 		ERROR("get auth server list");
