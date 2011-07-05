@@ -1,3 +1,6 @@
+/* The following code is subject to the terms and conditions defined in the
+   file 'COPYING' which is part of the source code distribution. */
+
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -98,6 +101,27 @@ int util_aes_encrypt(void *input, unsigned long input_length, void *key, void *i
 	
 	*output = ciphertext;
 	*output_length = ciphertext_length + final_length;
+	
+	return 0;
+}
+
+int util_aes_decrypt(void *input, unsigned long input_length, void *key, void *iv, void **output, unsigned int *output_length)
+{	
+	// Initialize OpenSSL AES stuff
+	EVP_CIPHER_CTX d_ctx;
+	EVP_CIPHER_CTX_init(&d_ctx);
+	EVP_DecryptInit_ex(&d_ctx, EVP_aes_128_cbc(), NULL, key, iv);
+	
+	// Decrypt
+	unsigned char *plaintext = malloc(input_length);
+	unsigned int plaintext_length;
+	unsigned int final_length;
+	EVP_DecryptInit_ex(&d_ctx, NULL, NULL, NULL, NULL);
+	EVP_DecryptUpdate(&d_ctx, plaintext, (int *)&plaintext_length, input, input_length);
+	EVP_DecryptFinal_ex(&d_ctx, plaintext + plaintext_length, (int *)&final_length);
+	
+	*output = plaintext;
+	*output_length = plaintext_length + final_length;
 	
 	return 0;
 }

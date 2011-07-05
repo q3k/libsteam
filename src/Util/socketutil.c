@@ -1,3 +1,6 @@
+/* The following code is subject to the terms and conditions defined in the
+   file 'COPYING' which is part of the source code distribution. */
+
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>

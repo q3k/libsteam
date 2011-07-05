@@ -1,3 +1,6 @@
+/* The following code is subject to the terms and conditions defined in the
+   file 'COPYING' which is part of the source code distribution. */
+
 #include <netinet/in.h>
 #include <unistd.h>
 #include <stdlib.h>

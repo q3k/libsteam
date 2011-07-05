@@ -1,3 +1,6 @@
+/* The following code is subject to the terms and conditions defined in the
+   file 'COPYING' which is part of the source code distribution. */
+
 #include <stdio.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -59,6 +62,11 @@ int main(int argc, char **argv)
 		printf("[e] Could not log in!\n");
 		return 1;
 	}
+	
+	char *server_a_ip = inet_ntoa(authclient.tgt.server_a.address);
+	char *server_b_ip = inet_ntoa(authclient.tgt.server_b.address);
+	
+	printf("[i] TGT servers: %s:%i, %s:%i\n", server_a_ip, authclient.tgt.server_a.port, server_b_ip, authclient.tgt.server_b.port);
 	
 	return 0;
 }

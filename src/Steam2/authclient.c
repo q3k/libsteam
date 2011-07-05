@@ -1,3 +1,6 @@
+/* The following code is subject to the terms and conditions defined in the
+   file 'COPYING' which is part of the source code distribution. */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -115,10 +118,9 @@ int s2_authclient_request_salt(T_S2_AUTHCLIENT *authclient, char *username)
 
 int s2_authclient_do_login(T_S2_AUTHCLIENT *authclient, char *password)
 {
-	unsigned char key[16];
 	unsigned char iv[16];
 	
-	s2_authclient_generate_key(authclient->salt_a, authclient->salt_b, password, key);
+	s2_authclient_generate_key(authclient->salt_a, authclient->salt_b, password, authclient->key);
 	util_generate_random_block(16, iv);
 	
 	unsigned long long microtime = 0xDCBFFEFF2BC000UL + (unsigned long long)time(NULL) * 1000000UL;
@@ -131,7 +133,7 @@ int s2_authclient_do_login(T_S2_AUTHCLIENT *authclient, char *password)
 	char *ciphertext;
 	unsigned int ciphertext_length;
 	
-	util_aes_encrypt(plaintext, 12, key, iv, (void **)&ciphertext, &ciphertext_length);
+	util_aes_encrypt(plaintext, 12, authclient->key, iv, (void **)&ciphertext, &ciphertext_length);
 	
 	void *packet = malloc(sizeof(T_S2_PACKET_AUTHENTICATE_HEADER) + ciphertext_length);
 	
@@ -167,6 +169,52 @@ unsigned char s2_authclient_get_account_info(T_S2_AUTHCLIENT *authclient)
 		return 1;
 	}
 	
+	unsigned long long login_time;
+	unsigned long long login_expiry;
+	
+	if (recv(authclient->serverclient.socket, &login_time, 8, 0) < 0)
+	{
+		ERROR("recv");
+		return 1;
+	}
+	if (recv(authclient->serverclient.socket, &login_expiry, 8, 0) < 0)
+	{
+		ERROR("recv");
+		return 1;
+	}
+	
+	void *packet;
+	unsigned int packet_length;
+	
+	if (s2_serverclient_read((T_S2_SERVERCLIENT *)authclient, &packet, &packet_length))
+	{
+		ERROR("read");
+		return 1;
+	}
+	unsigned short version = ntohs(*(unsigned short *)packet);
+	unsigned char *tgt_iv = ((unsigned char*)packet + 2);
+	unsigned short tgt_plaintext_size =  ntohs(*(((unsigned short *)packet) + 9));
+	unsigned short tgt_ciphertext_size = ntohs(*(((unsigned short *)packet) + 10));
+	unsigned char *tgt_ciphertext = ((unsigned char*)packet + 22);
+	
+	unsigned int tgt_plaintext_size_self;
+	void *tgt_plaintext;
+	util_aes_decrypt(tgt_ciphertext, tgt_ciphertext_size, authclient->key, tgt_iv, (void **)&tgt_plaintext, &tgt_plaintext_size_self);
+	
+	memcpy((void*)&authclient->tgt, tgt_plaintext, tgt_plaintext_size);
+	
+	if (tgt_plaintext_size_self != tgt_plaintext_size)
+	{
+		ERROR("decrypt");
+		free(tgt_plaintext);
+		free(packet);
+		return 1;
+	}
+	
+	printf("[i] Version %i, tgt size %i/%i.\n", version, tgt_plaintext_size, tgt_ciphertext_size);
+	
+	free(packet);
+	free(tgt_plaintext);
 	return 0;
 }
 

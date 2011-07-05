@@ -1,3 +1,6 @@
+/* The following code is subject to the terms and conditions defined in the
+   file 'COPYING' which is part of the source code distribution. */
+
 #ifndef __U_ERROR_H__
 #define __U_ERROR_H__
 

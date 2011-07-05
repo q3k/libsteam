@@ -1,1 +1,3 @@
-A Steam-interfacing library written in C. Based off the reverse engineering efforts of the opensteamworks and SteamRE projects.
+A Steam-interfacing library written in C. Based off the reverse engineering efforts of the OpenSteamWorks and SteamRE projects.
+
+This software is subject to a 3-clause BSD license and to the licenses of the OpenSSL toolkit. For more details, see the COPYING file.

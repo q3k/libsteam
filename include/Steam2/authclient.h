@@ -1,15 +1,11 @@
+/* The following code is subject to the terms and conditions defined in the
+   file 'COPYING' which is part of the source code distribution. */
+
 #ifndef __S2_AUTHCLIENT_H__
 #define __S2_AUTHCLIENT_H__
 
 #include "Steam2/serverclient.h"
-
-typedef struct {
-	T_S2_SERVERCLIENT serverclient;
-	unsigned int ip_internal;
-	unsigned int ip_external;
-	unsigned int salt_a;
-	unsigned int salt_b;
-} T_S2_AUTHCLIENT;
+#include "Common/structs.h"
 
 typedef struct {
 	unsigned int zero;
@@ -28,6 +24,28 @@ typedef struct {
 	unsigned short plaintext_length;
 	unsigned short ciphertext_length;
 } __attribute__((packed)) T_S2_PACKET_AUTHENTICATE_HEADER;
+
+typedef struct {
+	unsigned char account_record_key[16];
+	T_STEAM_GUID user_id;
+	
+	T_ADDRESS_PORT server_a;
+	T_ADDRESS_PORT server_b;
+	
+	unsigned long long creation_time;
+	unsigned long long expiration_time;
+} __attribute__((packed)) T_S2_CLIENT_TGT; // ticket granting ticked
+
+typedef struct {
+	T_S2_SERVERCLIENT serverclient;
+	unsigned int ip_internal;
+	unsigned int ip_external;
+	unsigned int salt_a;
+	unsigned int salt_b;
+	unsigned char key[16];
+	
+	T_S2_CLIENT_TGT tgt;
+} T_S2_AUTHCLIENT;
 
 void s2_authclient_init(T_S2_AUTHCLIENT *authclient);
 #define s2_authclient_connect(a, b, c) s2_serverclient_connect((T_S2_SERVERCLIENT *)a, b, c)
