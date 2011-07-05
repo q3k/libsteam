@@ -4,10 +4,13 @@
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <netdb.h>
+#include <string.h>
+#include <time.h>
 
 #include "Steam2/serverclient.h"
 #include "Steam2/dsclient.h"
 #include "Steam2/authclient.h"
+#include "Util/crypto.h"
 
 int main(int argc, char **argv)
 {
@@ -51,7 +54,7 @@ int main(int argc, char **argv)
 	
 	printf("[i] Connected to auth server.\n");
 	
-	if (s2_authclient_login(&authclient, argv[0], argv[1]))
+	if (s2_authclient_login(&authclient, argv[1], argv[2]))
 	{
 		printf("[e] Could not log in!\n");
 		return 1;

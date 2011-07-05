@@ -131,6 +131,10 @@ int s2_serverclient_send_command(T_S2_SERVERCLIENT *serverclient, unsigned char 
 		return 1;
 	}
 	
+	for(int i = 0; i < data_length + 1; i++)
+		printf("%02x ", data_final[i]);
+	printf("\n");
+	
 	
 	free((void *)data_final);
 	return 0;

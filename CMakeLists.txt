@@ -17,4 +17,10 @@ add_library(steam
 add_executable(libsteam-test
 	test/test.c
 )
-target_link_libraries(libsteam-test steam)
+target_link_libraries(libsteam-test steam crypto)
+set_target_properties (libsteam-test PROPERTIES
+	COMPILE_FLAGS "--std=gnu99 -Wall"
+)
+set_target_properties(steam PROPERTIES
+	COMPILE_FLAGS "--std=gnu99 -Wall"
+)
