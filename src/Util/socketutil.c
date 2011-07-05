@@ -9,6 +9,11 @@
 #include <netdb.h>
 #include <unistd.h>
 
+#ifdef __linux__
+#include <sys/ioctl.h>
+#include <linux/if.h>
+#endif
+
 #include "Util/socketutil.h"
 
 int util_getsockaddr(const char *address, unsigned short port, struct sockaddr_in *sockaddr_out, unsigned int *length_out)
@@ -52,8 +57,14 @@ int util_recv_timeout(int socket, void *data, unsigned int length, int timeout)
 	return recv(socket, data, length, 0);
 }
 
-unsigned int util_get_local_ip(void)
+unsigned int util_get_local_ip(int socket)
 {
+#ifdef __linux__
+	struct ifconf ifcnf;
+	ioctl(socket, SIOCGIFCONF, &ifcnf);
+	
+	return *(unsigned int *)&ifcnf.ifc_req->ifr_addr;
+#else
 	char hostname[200];
 	if (gethostname(hostname, sizeof(hostname)))
 		return 1;
@@ -63,4 +74,5 @@ unsigned int util_get_local_ip(void)
 		return 1;
 	
 	return *(unsigned int *)host->h_addr;
+#endif
 }

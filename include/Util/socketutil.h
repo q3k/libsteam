@@ -15,7 +15,7 @@
 int util_getsockaddr(const char *address, unsigned short port, struct sockaddr_in *sockaddr_out, unsigned int *length_out);
 // A quick wrapper around select() to implement a recv() timeout
 int util_recv_timeout(int socket, void *data, unsigned int length, int timeout);
-// Get local IP
-unsigned int util_get_local_ip(void);
+// Get local IP based on a socket
+unsigned int util_get_local_ip(int socket);
 
 #endif

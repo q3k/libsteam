@@ -40,7 +40,7 @@ int s2_authclient_request_ip(T_S2_AUTHCLIENT *authclient, char *username)
 	T_S2_PACKET_REQUEST_IP packet;
 	packet.zero = 0;
 	packet.four = 4;
-	packet.ip_internal = htonl(util_get_local_ip());
+	packet.ip_internal = htonl(util_get_local_ip(authclient->serverclient.socket));
 	packet.user_hash = htonl(util_jenkins_hash((void *)username, strlen(username)) & 1);
 	
 	if (send(authclient->serverclient.socket, (void *)&packet, sizeof(packet), 0) < 0)
@@ -63,7 +63,7 @@ int s2_authclient_request_ip(T_S2_AUTHCLIENT *authclient, char *username)
 		return 1;
 	}
 	
-	authclient->ip_internal = util_get_local_ip();
+	authclient->ip_internal = util_get_local_ip(authclient->serverclient.socket);
 	authclient->ip_external = ntohl(response.ip_external);
 	
 	char *internal_ip = inet_ntoa(*(struct in_addr *)(void*)&authclient->ip_internal);
@@ -201,16 +201,12 @@ unsigned char s2_authclient_get_account_info(T_S2_AUTHCLIENT *authclient)
 	unsigned int offset = 0;
 	unsigned short version = ntohs(*(unsigned short *)packet + offset);
 	offset += 2;
-	printf("Offset: %i\n", offset);
 	unsigned char *tgt_iv = packet + offset;
 	offset += 16;
-	printf("Offset: %i\n", offset);
 	unsigned short tgt_plaintext_size =  ntohs(*(unsigned short *)(packet + offset));
 	offset += 2;
-	printf("Offset: %i\n", offset);
 	unsigned short tgt_ciphertext_size = ntohs(*(unsigned short *)(packet + offset));
 	offset += 2;
-	printf("Offset: %i\n", offset);	
 	unsigned char *tgt_ciphertext = packet + offset;
 	
 	unsigned int tgt_plaintext_size_self;
