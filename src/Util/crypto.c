@@ -16,9 +16,23 @@ unsigned int util_jenkins_hash(void *data, unsigned int data_length)
 	unsigned int i = 0;
 	while (i + 12 <= data_length)
 	{
-		a += (unsigned int)buffer[i++] | ((unsigned int)buffer[i++] << 8) | ((unsigned int)buffer[i++] << 16) | ((unsigned int)buffer[i++] << 24);
-		b += (unsigned int)buffer[i++] | ((unsigned int)buffer[i++] << 8) |	((unsigned int)buffer[i++] << 16) |	((unsigned int)buffer[i++] << 24);
-		c += (unsigned int)buffer[i++] | ((unsigned int)buffer[i++] << 8) |	((unsigned int)buffer[i++] << 16) |	((unsigned int)buffer[i++] << 24);
+		unsigned int increment = (unsigned int)buffer[i++];
+		increment |= ((unsigned int)buffer[i++] << 8);
+		increment |= ((unsigned int)buffer[i++] << 16);
+		increment |= ((unsigned int)buffer[i++] << 24);
+		a +=  increment; 
+		
+		increment = (unsigned int)buffer[i++];
+		increment |= ((unsigned int)buffer[i++] << 8);
+		increment |= ((unsigned int)buffer[i++] << 16);
+		increment |= ((unsigned int)buffer[i++] << 24);
+		b += increment;
+		
+		increment = (unsigned int)buffer[i++];
+		increment |= ((unsigned int)buffer[i++] << 8);
+		increment |= ((unsigned int)buffer[i++] << 16);
+		increment |= ((unsigned int)buffer[i++] << 24);
+		c += increment;
 		
 		a -= b; a -= c; a ^= (c>>13);
 		b -= c; b -= a; b ^= (a<<8);
@@ -79,8 +93,8 @@ int util_aes_encrypt(void *input, unsigned long input_length, void *key, void *i
 	unsigned int ciphertext_length;
 	unsigned int final_length;
 	EVP_EncryptInit_ex(&e_ctx, NULL, NULL, NULL, NULL);
-	EVP_EncryptUpdate(&e_ctx, ciphertext, &ciphertext_length, input, input_length);
-	EVP_EncryptFinal_ex(&e_ctx, ciphertext + ciphertext_length, &final_length);
+	EVP_EncryptUpdate(&e_ctx, ciphertext, (int *)&ciphertext_length, input, input_length);
+	EVP_EncryptFinal_ex(&e_ctx, ciphertext + ciphertext_length, (int *)&final_length);
 	
 	*output = ciphertext;
 	*output_length = ciphertext_length + final_length;
