@@ -15,11 +15,10 @@
 #include "Steam2/dsclient.h"
 #include "Steam2/authclient.h"
 #include "Util/crypto.h"
-#include "Common/blob.h"
 
 int main(int argc, char **argv)
 {
-	/*if (argc < 3)
+	if (argc < 3)
 	{
 		printf("Usage: %s username password\n", argv[0]);
 		return 1;
@@ -68,21 +67,7 @@ int main(int argc, char **argv)
 	char *server_a_ip = inet_ntoa(authclient.tgt.server_a.address);
 	char *server_b_ip = inet_ntoa(authclient.tgt.server_b.address);
 	
-	printf("[i] TGT servers: %s:%i, %s:%i\n", server_a_ip, authclient.tgt.server_a.port, server_b_ip, authclient.tgt.server_b.port);*/
-	
-	char *key = "\x4a\x32\xd7\x0d\x49\x00\x78\x72\xdf\xa9\x61\x45\x7b\xf4\xb0\xef";
-	FILE *f = fopen("account_data.bin", "rb");
-	fseek(f, 0, SEEK_END);
-	unsigned int blob_size = ftell(f);
-	fseek(f, 0, SEEK_SET);
-	
-	void *blob_data = malloc(blob_size);
-	fread(blob_data, 1, blob_size, f);
-	fclose(f);
-	
-	T_BLOB *blob = blob_create(blob_data, blob_size, key);
-	
-	free(blob_data);
+	printf("[i] TGT servers: %s:%i, %s:%i\n", server_a_ip, authclient.tgt.server_a.port, server_b_ip, authclient.tgt.server_b.port);
 	
 	return 0;
 }

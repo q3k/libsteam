@@ -9,6 +9,7 @@
 #include "Util/crypto.h"
 #include "Util/socketutil.h"
 #include "Util/error.h"
+#include "Common/blob.h"
 
 void s2_authclient_init(T_S2_AUTHCLIENT *authclient)
 {
@@ -241,14 +242,7 @@ unsigned char s2_authclient_get_account_info(T_S2_AUTHCLIENT *authclient)
 	
 	unsigned char *account_data = packet + offset;
 	
-	FILE *f = fopen("account_data.bin", "wb");
-	fwrite(account_data, 1, packet_length - offset, f);
-	fclose(f);
-	printf("[i] Written account data, %u bytes.\n", packet_length - offset);
-	printf("[i] Account record key: ");
-	for (int i = 0; i < 16; i++)
-		printf("%02x", authclient->tgt.account_record_key[i]);
-	printf("\n");
+	T_BLOB *auth_blob = blob_create(account_data, packet_length - offset, authclient->tgt.account_record_key);
 	
 	free(packet);
 	free(tgt_plaintext);
