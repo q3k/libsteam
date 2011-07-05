@@ -22,27 +22,24 @@ void s2_serverclient_init(T_S2_SERVERCLIENT *serverclient)
 
 int s2_serverclient_connect(T_S2_SERVERCLIENT *serverclient, char *ip, unsigned short port)
 {
-	struct sockaddr_in *address = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
+	struct sockaddr_in address;
 	unsigned int address_length;
 	
 	if (util_getsockaddr(ip, port, &address, &address_length))
 	{
 		ERROR("s2_serverclient_connect failed (util_getsockaddr)!");
-		free((void *)address);
 		return 1;
 	}
 	
 	serverclient->ip = ip;
 	
-	if (connect(serverclient->socket, (struct sockaddr *)address, address_length))
+	if (connect(serverclient->socket, (struct sockaddr *)&address, address_length))
 	{
 		ERROR("s2_serverclient_connect failed (connect)!");
-		free((void *)address);
 		return 1;
 	}
 	
 	serverclient->connected = 1;
-	free((void *)address);
 	return 0;
 }
 

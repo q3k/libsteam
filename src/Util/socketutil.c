@@ -11,7 +11,7 @@
 
 #include "Util/socketutil.h"
 
-int util_getsockaddr(const char *address, unsigned short port, struct sockaddr_in **sockaddr_out, unsigned int *length_out)
+int util_getsockaddr(const char *address, unsigned short port, struct sockaddr_in *sockaddr_out, unsigned int *length_out)
 {
 	struct addrinfo hints, *result;
 	
@@ -25,7 +25,7 @@ int util_getsockaddr(const char *address, unsigned short port, struct sockaddr_i
 	if (getaddrinfo(address, port_ascii, &hints, &result))
 		return 1;
 	
-	*sockaddr_out = (struct sockaddr_in *)result->ai_addr;
+	memcpy(sockaddr_out, result->ai_addr, sizeof(struct sockaddr_in));
 	*length_out = result->ai_addrlen;
 	
 	return 0;
