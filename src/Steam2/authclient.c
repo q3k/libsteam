@@ -44,7 +44,7 @@ int s2_authclient_request_ip(T_S2_AUTHCLIENT *authclient, char *username)
 	T_S2_PACKET_REQUEST_IP packet;
 	packet.zero = 0;
 	packet.four = 4;
-	packet.ip_internal = util_get_local_ip();
+	packet.ip_internal = htonl(util_get_local_ip());
 	packet.user_hash = htonl(util_jenkins_hash((void *)username, strlen(username)) & 1);
 	
 	if (send(authclient->serverclient.socket, (void *)&packet, sizeof(packet), 0) < 0)
@@ -70,6 +70,8 @@ int s2_authclient_request_ip(T_S2_AUTHCLIENT *authclient, char *username)
 	authclient->ip_internal = util_get_local_ip();
 	authclient->ip_external = ntohl(response.ip_external);
 	
+	char *internal_ip = inet_ntoa(*(struct in_addr *)(void*)&authclient->ip_internal);
+	printf("[i] Out local IP address is %s\n", internal_ip);
 	char *external_ip = inet_ntoa(*(struct in_addr *)(void*)&authclient->ip_external);
 	printf("[i] Out external IP address is %s\n", external_ip);
 	
@@ -106,10 +108,6 @@ int s2_authclient_request_salt(T_S2_AUTHCLIENT *authclient, char *username)
 		return 1;
 	}
 	
-	//authclient->salt_a = ntohl(authclient->salt_a);
-	//authclient->salt_a = 0xdeadbeef;
-	//authclient->salt_b = ntohl(authclient->salt_b);
-	
 	printf("[i] Salts: %08x %08x\n", authclient->salt_a, authclient->salt_b);
 	
 	return 0;
@@ -129,43 +127,19 @@ int s2_authclient_do_login(T_S2_AUTHCLIENT *authclient, char *password)
 	unsigned char plaintext[12];
 	memcpy(plaintext, &microtime, 8);
 	memcpy(plaintext + 8, &authclient->ip_internal, 4);
-	printf("PLAINTEXT:\n");
-	for (int i = 0; i < 12; i++)
-		printf("%02x", plaintext[i]);
-	printf("\n");
-	
-	printf("KEY:\n");
-	for (int i = 0; i < 16; i++)
-		printf("%02x", key[i]);
-	printf("\n");
-	
-	printf("IV:\n");
-	for (int i = 0; i < 16; i++)
-		printf("%02x", iv[i]);
-	printf("\n");
 	
 	char *ciphertext;
 	unsigned int ciphertext_length;
-	
-	
 	
 	util_aes_encrypt(plaintext, 12, key, iv, (void **)&ciphertext, &ciphertext_length);
 	
 	void *packet = malloc(sizeof(T_S2_PACKET_AUTHENTICATE_HEADER) + ciphertext_length);
 	
-	printf("Ciphertext length is %i\n", ciphertext_length);
-	
 	T_S2_PACKET_AUTHENTICATE_HEADER *header = (T_S2_PACKET_AUTHENTICATE_HEADER *)packet;
 	memcpy(header->iv, iv, 16);
 	header->plaintext_length = htons(12);
 	header->ciphertext_length = htons(ciphertext_length);
-	memcpy((unsigned char *)packet + sizeof(T_S2_PACKET_AUTHENTICATE_HEADER), ciphertext, ciphertext_length);
-	
-	printf("CIPHERTEXT:\n");
-	for (int i = 0; i < ciphertext_length; i++)
-		printf("%02x", ((unsigned char *)packet)[sizeof(T_S2_PACKET_AUTHENTICATE_HEADER) + i]);
-	printf("\n");
-	
+	memcpy((unsigned char *)packet + sizeof(T_S2_PACKET_AUTHENTICATE_HEADER), ciphertext, ciphertext_length);	
 	
 	if (s2_serverclient_write((T_S2_SERVERCLIENT *)authclient, packet, sizeof(T_S2_PACKET_AUTHENTICATE_HEADER) + ciphertext_length))
 	{
@@ -173,7 +147,7 @@ int s2_authclient_do_login(T_S2_AUTHCLIENT *authclient, char *password)
 		ERROR("packet write");
 		return 1;
 	}
-	
+	free((void*)ciphertext);
 	return 0;
 }
 

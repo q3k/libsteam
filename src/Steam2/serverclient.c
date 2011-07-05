@@ -86,25 +86,26 @@ int s2_serverclient_read(T_S2_SERVERCLIENT *serverclient, void **data_out, unsig
 
 int s2_serverclient_write(T_S2_SERVERCLIENT *serverclient, void *data, unsigned int length)
 {
+	unsigned char *data_final = (unsigned char *)malloc(length + 4);
 	unsigned int length_network = ntohl(length);
 	
-	if (send(serverclient->socket, (void *)&length_network, 4, 0) < 0)
-		return 1;
+	memcpy(data_final, &length_network, 4);
+	memcpy(data_final + 4, data, length);
 	
 	unsigned int bytes_sent = 0;
-	unsigned int bytes_total = length ;
+	unsigned int bytes_total = length + 4;
 	int result = 0;
 	
 	while (bytes_sent < bytes_total)
 	{
-		result = send(serverclient->socket, data + bytes_sent, bytes_total, 0);
+		result = send(serverclient->socket, data_final + bytes_sent, bytes_total, 0);
 		if (result)
 			break;
 		
 		bytes_sent += result;
 		bytes_total -= result;
 	}
-	
+	free(data_final);
 	return result == -1 ? 1 : 0;
 }
 
