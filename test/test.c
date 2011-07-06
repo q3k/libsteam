@@ -17,15 +17,17 @@
 #include "Steam2/authclient.h"
 #include "Util/crypto.h"
 
-char *strtolower(char *dest, const char *src, size_t n) {
-        if(!n) {
-                return 0;
-        } else {
-                char *d = dest;
-                while(*src && --n > 0) *d++ = tolower(*src++);
-                *d = 0;
-                return dest;
-        }
+char *strtolower(char *dest, const char *src, size_t n)
+{
+	if(!n)
+	{
+		return 0;
+	} else {
+		char *d = dest;
+		while(*src && --n > 0) *d++ = tolower(*src++);
+		*d = 0;
+		return dest;
+	}
 }
 
 int main(int argc, char **argv)
@@ -35,11 +37,10 @@ int main(int argc, char **argv)
 		printf("Usage: %s username password\n", argv[0]);
 		return 1;
 	}
-	
-        char* username = argv[1];
-        char* password = argv[2];
-        char unbuf[128];
-        char* newusername = strtolower(unbuf, username, sizeof unbuf);
+	char* username = argv[1];
+	char* password = argv[2];
+	char unbuf[128];
+	char* newusername = strtolower(unbuf, username, sizeof unbuf);
 
 	T_S2_SERVERCLIENT serverclient;
 	
