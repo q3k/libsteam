@@ -10,11 +10,23 @@
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "Steam2/serverclient.h"
 #include "Steam2/dsclient.h"
 #include "Steam2/authclient.h"
 #include "Util/crypto.h"
+
+char *strtolower(char *dest, const char *src, size_t n) {
+        if(!n) {
+                return 0;
+        } else {
+                char *d = dest;
+                while(*src && --n > 0) *d++ = tolower(*src++);
+                *d = 0;
+                return dest;
+        }
+}
 
 int main(int argc, char **argv)
 {
@@ -24,6 +36,11 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	
+        char* username = argv[1];
+        char* password = argv[2];
+        char unbuf[128];
+        char* newusername = strtolower(unbuf, username, sizeof unbuf);
+
 	T_S2_SERVERCLIENT serverclient;
 	
 	s2_serverclient_init(&serverclient);
@@ -37,7 +54,7 @@ int main(int argc, char **argv)
 	
 	T_S2_AUTH_SERVER authserver;
 	
-	if (s2_dsclient_get_auth_server(&serverclient, argv[1], &authserver))
+	if (s2_dsclient_get_auth_server(&serverclient, newusername, &authserver))
 	{
 		printf("[e] Could not get auth servers!\n");
 		return 1;
@@ -58,7 +75,7 @@ int main(int argc, char **argv)
 	
 	printf("[i] Connected to auth server.\n");
 	
-	if (s2_authclient_login(&authclient, argv[1], argv[2]))
+	if (s2_authclient_login(&authclient, newusername, password))
 	{
 		printf("[e] Could not log in!\n");
 		return 1;
