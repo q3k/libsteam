@@ -5,8 +5,15 @@
 #define __U_ERROR_H__
 
 #include <stdio.h>
+#include <errno.h>
 
 // Error and warning and info logging
-#define ERROR(x) printf("[e] @%s:%i\n[e] %s\n", __FILE__, __LINE__, x)
+#define ERROR(x) printf("[e] @%s:%i: %s\n", __FILE__, __LINE__, x); \
+if (errno != 0) \
+{ \
+    fprintf(stderr, "[e] POSIX error %i: ", errno); \
+    perror(""); \
+    errno = 0; \
+}
 
 #endif
