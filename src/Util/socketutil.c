@@ -59,12 +59,12 @@ int util_recv_timeout(int socket, void *data, unsigned int length, int timeout)
 
 unsigned int util_get_local_ip(int socket)
 {
-#ifdef __linux__
+/*#ifdef __linux__
 	struct ifconf ifcnf;
 	ioctl(socket, SIOCGIFCONF, &ifcnf);
 	
 	return *(unsigned int *)&ifcnf.ifc_req->ifr_addr;
-#else
+#else*/
 	char hostname[200];
 	if (gethostname(hostname, sizeof(hostname)))
 		return 1;
@@ -74,5 +74,5 @@ unsigned int util_get_local_ip(int socket)
 		return 1;
 	
 	return *(unsigned int *)host->h_addr;
-#endif
+//#endif
 }
