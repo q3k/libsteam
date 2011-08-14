@@ -138,8 +138,8 @@ int s2_serverclient_send_command(T_S2_SERVERCLIENT *serverclient, unsigned char 
 
 int s2_serverclient_handshake(T_S2_SERVERCLIENT *serverclient, unsigned int expected_server_type)
 {
-	unsigned long type_network = htonl(expected_server_type);	
-	if (send(serverclient->socket, (void *)&type_network, sizeof(unsigned long), 0) < 1)
+	unsigned int type_network = htonl(expected_server_type);	
+	if (send(serverclient->socket, (void *)&type_network, sizeof(unsigned int), 0) < 1)
 	{
 		ERROR("handshake write error");
 		return 1;

@@ -38,7 +38,7 @@ int util_getsockaddr(const char *address, unsigned short port, struct sockaddr_i
 
 int util_recv_timeout(int socket, void *data, unsigned int length, int timeout)
 {
-	/*fd_set sockets;
+	fd_set sockets;
 	
 	FD_ZERO(&sockets);
 	FD_SET(socket, &sockets);
@@ -52,7 +52,7 @@ int util_recv_timeout(int socket, void *data, unsigned int length, int timeout)
 	if (result == 0)
 		return -2; //timeout
 	else if (result == -1)
-		return -1; // some other error*/
+		return -1; // some other error
 	
 	return recv(socket, data, length, 0);
 }
